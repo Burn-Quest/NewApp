@@ -218,7 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
                               children: [
                                 _buildMenuCard(
                                   context,
