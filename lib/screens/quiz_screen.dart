@@ -1,3 +1,4 @@
+import 'package:burnquest/models/util/quizScore.dart';
 import 'package:flutter/material.dart';
 import '../models/quiz_question.dart';
 import '../utils/app_theme.dart';
@@ -207,6 +208,12 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Widget _buildResultScreen() {
     final percentage = (_score / quizQuestions.length) * 100;
+
+    if (percentage > QuizScore.bestScore) {
+      QuizScore.bestScore = percentage;
+    }
+
+    QuizScore.bestScore = percentage;
     String message;
     Color messageColor;
 

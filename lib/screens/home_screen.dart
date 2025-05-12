@@ -1,3 +1,4 @@
+import 'package:burnquest/models/util/quizScore.dart';
 import 'package:burnquest/screens/prevention.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  double bestScore = 0;
+
   double _dragExtent = 0.3; // Tamanho inicial
   final double _maxHeight = 0.75; // Tamanho máximo
   final double _minHeight = 0.25; // Tamanho mínimo
@@ -25,9 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _checkQuizAccess();
 
+    _updateBestScore();
+
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
     );
+  }
+
+  void _updateBestScore() {
+    setState(() {
+      bestScore = QuizScore.bestScore;
+    });
   }
 
   Future<void> _resetQuizAccess() async {
@@ -144,10 +155,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   Visibility(
                     visible: _canAccessQuiz,
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado: 80%', // Texto mockado, to implement
+                        'Melhor resultado: ${bestScore.toInt()}%',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -234,10 +245,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   '/quiz',
                                   onTap:
                                       _canAccessQuiz
-                                          ? () => Navigator.pushNamed(
-                                            context,
-                                            '/quiz',
-                                          )
+                                          ? () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/quiz',
+                                            ).then((_) => _updateBestScore());
+                                          }
                                           : null,
                                   isEnabled: _canAccessQuiz,
                                 ),
