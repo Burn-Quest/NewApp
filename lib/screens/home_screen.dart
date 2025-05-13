@@ -73,15 +73,29 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: false,
         child: Stack(
           children: [
+            // Imagem acima do título
             Positioned(
-              top: 40,
+              top: -50,
+              left: 0,
+              right: 10,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/BurnQuestLogo.png',
+                  width: 300, // ajuste conforme necessário
+                ),
+              ),
+            ),
+
+            // Título
+            Positioned(
+              top: 160, // ajustado para ficar abaixo da imagem
               left: 0,
               right: 0,
               child: Center(
                 child: const Text(
                   'Prevenção de Queimaduras',
                   style: TextStyle(
-                    fontSize: 50,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -90,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
+            // Botão e avisos
             Positioned(
               top: 350,
               left: 0,
@@ -130,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Visibility(
                     visible: !_canAccessQuiz,
                     child: Container(
@@ -152,13 +166,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-
                   Visibility(
                     visible: _canAccessQuiz,
                     child: Padding(
                       padding: EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado: ${bestScore.toInt()}%',
+                        'Melhor resultado no quiz: ${bestScore.toInt()}%',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -215,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? Icons.keyboard_arrow_up
                                 : Icons.keyboard_arrow_down,
                             color: AppColors.primary,
-                            size: 40,
+                            size: 60,
                           ),
                         ),
                       ),
