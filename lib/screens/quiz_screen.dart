@@ -213,7 +213,6 @@ class _QuizScreenState extends State<QuizScreen> {
       QuizScore.bestScore = percentage;
     }
 
-    QuizScore.bestScore = percentage;
     String message;
     Color messageColor;
 

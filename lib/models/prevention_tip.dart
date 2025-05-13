@@ -70,4 +70,45 @@ final List<PreventionTip> preventionTips = [
     whatNotToDo:
         'Nunca toque, beba ou brinque com produtos de limpeza ou químicos.',
   ),
+  //news
+  const PreventionTip(
+    title: 'Insetos que Queimam',
+    description:
+        'Alguns insetos e lagartas podem causar queimaduras ou irritações graves na pele ao entrarem em contato com ela.',
+    icon: Icons.bug_report,
+    whatToDo:
+        'Use roupas protetoras ao entrar em áreas de mata ou jardins, e aplique repelente.',
+    whatNotToDo:
+        'Não toque em insetos desconhecidos, lagartas peludas ou ninhos. Evite andar descalço em áreas de risco.',
+  ),
+  const PreventionTip(
+    title: 'Queimaduras por Água-Viva',
+    description:
+        'O contato com águas-vivas pode causar queimaduras dolorosas e irritações na pele devido às toxinas liberadas pelos tentáculos.',
+    icon: Icons.water_damage,
+    whatToDo:
+        'Fique atento a avisos de perigo na praia. Ao avistar águas-vivas na areia ou no mar, mantenha distância e avise outras pessoas.',
+    whatNotToDo:
+        'Não toque na água-viva, mesmo que esteja fora da água e aparentemente morta. Não esfregue a pele após o contato — isso espalha as toxinas.',
+  ),
+  const PreventionTip(
+    title: 'Queimaduras por Equipamentos Eletrônicos',
+    description:
+        'Celulares, carregadores e outros eletrônicos podem superaquecer e causar queimaduras se usados ou carregados de forma inadequada.',
+    icon: Icons.phone_iphone,
+    whatToDo:
+        'Use apenas carregadores originais e evite cobrir os aparelhos durante o uso ou carregamento. Faça pausas para resfriar o dispositivo.',
+    whatNotToDo:
+        'Não use o celular enquanto carrega na tomada por longos períodos. Não durma com o aparelho embaixo do travesseiro ou próximo ao corpo.',
+  ),
+  const PreventionTip(
+    title: 'Queimaduras por Fricção',
+    description:
+        'Quedas no asfalto ou superfícies ásperas podem gerar queimaduras por atrito, especialmente em crianças ou ciclistas.',
+    icon: Icons.directions_bike,
+    whatToDo:
+        'Use equipamentos de proteção como joelheiras e capacetes. Oriente sobre segurança no trânsito e brincadeiras.',
+    whatNotToDo:
+        'Não pratique esportes de velocidade sem proteção. Não ignore lesões leves — elas podem infeccionar.',
+  ),
 ];

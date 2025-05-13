@@ -105,4 +105,53 @@ final List<QuizQuestion> quizQuestions = [
     explanation:
         'Bebidas quentes devem ser carregadas com cuidado, usando as duas mãos e sem encher demais o copo.',
   ),
+  const QuizQuestion(
+    question:
+        'O que você deve fazer ao ver uma lagarta peluda ou inseto estranho?',
+    answers: [
+      'Tocar para ver se é perigoso',
+      'Tentar espantar com a mão',
+      'Observar de perto e soprar',
+      'Ficar longe e avisar um adulto',
+    ],
+    correctAnswerIndex: 3,
+    explanation:
+        'Insetos como lagartas podem causar queimaduras e irritações. Nunca toque — mantenha distância e avise um adulto.',
+  ),
+  const QuizQuestion(
+    question: 'O que fazer se você ver uma água-viva na praia?',
+    answers: [
+      'Tocar para ver se está viva',
+      'Brincar com ela usando um galho',
+      'Avisar um adulto e manter distância',
+      'Empurrar de volta pro mar com o pé',
+    ],
+    correctAnswerIndex: 2,
+    explanation:
+        'Mesmo fora da água, a água-viva pode queimar. É importante manter distância e avisar um adulto.',
+  ),
+  const QuizQuestion(
+    question: 'O que você deve evitar fazer com o celular para não se queimar?',
+    answers: [
+      'Usar o celular com capinha',
+      'Dormir com ele debaixo do travesseiro',
+      'Usar fone de ouvido',
+      'Carregar durante o dia',
+    ],
+    correctAnswerIndex: 1,
+    explanation:
+        'Celulares podem superaquecer. Dormir com eles debaixo do travesseiro aumenta o risco de queimaduras.',
+  ),
+  const QuizQuestion(
+    question: 'O que ajuda a evitar queimaduras quando você anda de bicicleta?',
+    answers: [
+      'Andar descalço para sentir melhor o pedal',
+      'Usar roupas leves e soltas',
+      'Usar capacete e joelheiras',
+      'Evitar andar em subidas',
+    ],
+    correctAnswerIndex: 2,
+    explanation:
+        'Equipamentos de proteção como capacete e joelheiras ajudam a evitar ferimentos e queimaduras em quedas.',
+  ),
 ];
