@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  double bestScore = 0;
+  double _bestScore = 0.0;
 
   double _dragExtent = 0.3; // Tamanho inicial
   final double _maxHeight = 0.75; // Tamanho máximo
@@ -27,17 +27,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkQuizAccess();
-
-    _updateBestScore();
+    _checkQuizAccess();
+    _loadBestScore();
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
     );
   }
 
-  void _updateBestScore() {
+  void _loadBestScore() async {
+    double score = await QuizScore.loadBestScore();
     setState(() {
-      bestScore = QuizScore.bestScore;
+      _bestScore = score;
     });
   }
 
@@ -73,29 +74,28 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: false,
         child: Stack(
           children: [
-            // Imagem acima do título
             Positioned(
-              top: -50,
+              top: 10,
               left: 0,
               right: 10,
               child: Center(
                 child: Image.asset(
                   'assets/images/BurnQuestLogo.png',
-                  width: 300, // ajuste conforme necessário
+                  width: 350,
                 ),
               ),
             ),
 
             // Título
             Positioned(
-              top: 160, // ajustado para ficar abaixo da imagem
+              top: 150, // ajustado para ficar abaixo da imagem
               left: 0,
               right: 0,
               child: Center(
                 child: const Text(
                   'Prevenção de Queimaduras',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado no quiz: ${bestScore.toInt()}%',
+                        'Melhor resultado no quiz: ${_bestScore.toStringAsFixed(0)}%',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -262,7 +262,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Navigator.pushNamed(
                                               context,
                                               '/quiz',
-                                            ).then((_) => _updateBestScore());
+                                            ).then((result) {
+                                              if (result != null &&
+                                                  result is double) {
+                                                _loadBestScore(); // Atualiza a pontuação exibida
+                                              }
+                                            });
                                           }
                                           : null,
                                   isEnabled: _canAccessQuiz,

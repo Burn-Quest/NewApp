@@ -209,9 +209,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget _buildResultScreen() {
     final percentage = (_score / quizQuestions.length) * 100;
 
-    if (percentage > QuizScore.bestScore) {
-      QuizScore.bestScore = percentage;
-    }
+    QuizScore.saveBestScore(percentage);
 
     String message;
     Color messageColor;
