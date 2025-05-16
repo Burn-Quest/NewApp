@@ -12,8 +12,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
-  double _bestScore = 0.0;
+  double bestScore = 0;
 
   double _dragExtent = 0.25; // sincronizado com o initialChildSize
   final double _maxHeight = 0.75;
@@ -27,11 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkQuizAccess();
-    _loadBestScore();
+    _updateBestScore();
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
     );
+
 
     // Sincroniza _dragExtent com a posição inicial da sheet
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -51,10 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _loadBestScore() async {
-    double score = await QuizScore.loadBestScore();
+  void _updateBestScore() {
     setState(() {
-      _bestScore = score;
+      bestScore = QuizScore.bestScore;
     });
   }
 
@@ -185,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado no quiz: ${_bestScore.toInt()}%',
+                        'Melhor resultado: ${bestScore.toStringAsFixed(0)}%',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -271,17 +272,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   AppColors.secondary,
                                   '/quiz',
                                   onTap: _canAccessQuiz
-                                      ? () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/quiz',
-                                          ).then((result) {
-                                            if (result != null &&
-                                                result is double) {
-                                              _loadBestScore();
-                                            }
-                                          });
-                                        }
+                                       ? () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/quiz',
+                                            ).then((_) => _updateBestScore());
+                                          }
                                       : null,
                                   isEnabled: _canAccessQuiz,
                                 ),
