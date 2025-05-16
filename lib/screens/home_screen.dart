@@ -15,10 +15,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   double _bestScore = 0.0;
 
-  double _dragExtent = 0.3; // Tamanho inicial
-  final double _maxHeight = 0.75; // Tamanho máximo
-  final double _minHeight = 0.25; // Tamanho mínimo
-  bool _canAccessQuiz = false; // Controla se o Quiz pode ser acessado
+  double _dragExtent = 0.25; // sincronizado com o initialChildSize
+  final double _maxHeight = 0.75;
+  final double _minHeight = 0.25;
+  bool _canAccessQuiz = false;
 
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
@@ -27,12 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkQuizAccess();
-    _checkQuizAccess();
     _loadBestScore();
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
     );
+
+    // Sincroniza _dragExtent com a posição inicial da sheet
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final initialExtent = _sheetController.size ?? _minHeight;
+      setState(() {
+        _dragExtent = initialExtent;
+      });
+
+      _sheetController.addListener(() {
+        final currentExtent = _sheetController.size;
+        if (currentExtent != null && currentExtent != _dragExtent) {
+          setState(() {
+            _dragExtent = currentExtent;
+          });
+        }
+      });
+    });
   }
 
   void _loadBestScore() async {
@@ -86,13 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Título
             Positioned(
-              top: 150, // ajustado para ficar abaixo da imagem
+              top: 150,
               left: 0,
               right: 0,
-              child: Center(
-                child: const Text(
+              child: const Center(
+                child: Text(
                   'Prevenção de Queimaduras',
                   style: TextStyle(
                     fontSize: 24,
@@ -104,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Botão e avisos
             Positioned(
               top: 350,
               left: 0,
@@ -169,10 +183,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Visibility(
                     visible: _canAccessQuiz,
                     child: Padding(
-                      padding: EdgeInsets.only(top: 24),
+                      padding: const EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado no quiz: ${_bestScore.toStringAsFixed(0)}%',
-                        style: TextStyle(
+                        'Melhor resultado no quiz: ${_bestScore.toInt()}%',
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -208,10 +222,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          final newExtent =
-                              _dragExtent == _minHeight
-                                  ? _maxHeight
-                                  : _minHeight;
+                          final newExtent = _dragExtent == _minHeight
+                              ? _maxHeight
+                              : _minHeight;
                           _sheetController.animateTo(
                             newExtent,
                             duration: const Duration(milliseconds: 300),
@@ -242,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
                               shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
                               children: [
                                 _buildMenuCard(
                                   context,
@@ -256,20 +270,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.quiz_outlined,
                                   AppColors.secondary,
                                   '/quiz',
-                                  onTap:
-                                      _canAccessQuiz
-                                          ? () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/quiz',
-                                            ).then((result) {
-                                              if (result != null &&
-                                                  result is double) {
-                                                _loadBestScore(); // Atualiza a pontuação exibida
-                                              }
-                                            });
-                                          }
-                                          : null,
+                                  onTap: _canAccessQuiz
+                                      ? () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/quiz',
+                                          ).then((result) {
+                                            if (result != null &&
+                                                result is double) {
+                                              _loadBestScore();
+                                            }
+                                          });
+                                        }
+                                      : null,
                                   isEnabled: _canAccessQuiz,
                                 ),
                               ],
@@ -344,8 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: InkWell(
-            onTap:
-                onTap ??
+            onTap: onTap ??
                 () {
                   if (route != null) {
                     Navigator.pushNamed(context, route);
@@ -376,24 +388,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showExitDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Sair do aplicativo?'),
-            content: const Text('Você tem certeza que deseja sair?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await _resetQuizAccess();
-                  Navigator.pop(context, true);
-                },
-                child: const Text('Sair'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Sair do aplicativo?'),
+        content: const Text('Você tem certeza que deseja sair?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
           ),
+          TextButton(
+            onPressed: () async {
+              await _resetQuizAccess();
+              Navigator.pop(context, true);
+            },
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
     ).then((value) {
       if (value == true) {
         SystemNavigator.pop();
