@@ -41,7 +41,10 @@ flutter:
   uses-material-design: true
 
   assets:
-  - assets/
+  - assets/images/BurnQuestLogo.png
+  - assets/images/logo_creditos/
+  - assets/images/app_icon.png
+  - assets/images/quiz/
 
   # Uncomment the following section to add assets to your application:
   # assets:
