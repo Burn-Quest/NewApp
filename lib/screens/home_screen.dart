@@ -368,6 +368,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancelar'),
               ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                child: const Text('Sair'),
+              ),
             ],
           ),
     ).then((value) {
