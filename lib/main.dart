@@ -1,3 +1,4 @@
+import 'package:burnquest/models/util/quiz_score.dart';
 import 'package:flutter/material.dart';
 import 'screens/prevention.dart';
 import 'screens/home_screen.dart';
@@ -6,7 +7,9 @@ import 'screens/credits_screen.dart';
 import 'screens/prevention_tips_screen.dart';
 import 'utils/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await QuizScore.loadBestScore(); // garante que o score será carregado antes do app iniciar
   runApp(const BurnPreventionApp());
 }
 

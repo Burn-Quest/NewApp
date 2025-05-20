@@ -1,5 +1,6 @@
-import 'package:burnquest/models/util/quizScore.dart';
+import 'package:burnquest/models/util/quiz_score.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quiz_question.dart';
 import '../utils/app_theme.dart';
 
@@ -16,22 +17,27 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _quizCompleted = false;
   bool _showNextButton = false;
   bool _showExplanation = false;
-  List<bool?> _answers = [];
+  List<int?> _selectedAnswerIndices = [];
 
   @override
   void initState() {
     super.initState();
-    _answers = List.filled(quizQuestions.length, null);
+    _selectedAnswerIndices = List.filled(quizQuestions.length, null);
+  }
+
+  Future<void> _saveBestScore(double score) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('best_quiz_score', score);
   }
 
   void _answerQuestion(int answerIndex) {
-    if (_answers[_currentQuestionIndex] != null) return;
+    if (_selectedAnswerIndices[_currentQuestionIndex] != null) return;
 
     final isCorrect =
         answerIndex == quizQuestions[_currentQuestionIndex].correctAnswerIndex;
 
     setState(() {
-      _answers[_currentQuestionIndex] = isCorrect;
+      _selectedAnswerIndices[_currentQuestionIndex] = answerIndex;
       if (isCorrect) _score++;
       _showNextButton = true;
       _showExplanation = !isCorrect;
@@ -57,7 +63,7 @@ class _QuizScreenState extends State<QuizScreen> {
       _quizCompleted = false;
       _showNextButton = false;
       _showExplanation = false;
-      _answers = List.filled(quizQuestions.length, null);
+      _selectedAnswerIndices = List.filled(quizQuestions.length, null);
     });
   }
 
@@ -115,18 +121,35 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   List<Widget> _buildAnswerCards(QuizQuestion question) {
+    final selectedIndex = _selectedAnswerIndices[_currentQuestionIndex];
+    final isAnswered = selectedIndex != null;
+
     return List.generate(question.answers.length, (index) {
       final isCorrect = index == question.correctAnswerIndex;
-      final isSelected = _answers[_currentQuestionIndex] != null;
+      final wasSelected = index == selectedIndex;
 
       Color? bgColor;
-      if (isSelected) {
+      Color? borderColor;
+      Color? avatarColor;
+
+      if (isAnswered) {
         if (isCorrect) {
           bgColor = AppColors.success;
-        } else if (_answers[_currentQuestionIndex] == false &&
-            index != question.correctAnswerIndex) {
+          borderColor = AppColors.success;
+          avatarColor = AppColors.success;
+        } else if (wasSelected) {
+          bgColor = AppColors.error;
+          borderColor = AppColors.error;
+          avatarColor = AppColors.error;
+        } else {
           bgColor = Colors.grey.shade300;
+          borderColor = Colors.grey.shade300;
+          avatarColor = Colors.grey;
         }
+      } else {
+        bgColor = Colors.white;
+        borderColor = Colors.grey.shade300;
+        avatarColor = AppColors.primary;
       }
 
       return Card(
@@ -142,22 +165,13 @@ class _QuizScreenState extends State<QuizScreen> {
             question.answers[index],
             style: const TextStyle(fontSize: 16),
           ),
-          onTap: isSelected ? null : () => _answerQuestion(index),
+          onTap: isAnswered ? null : () => _answerQuestion(index),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color:
-                  isSelected
-                      ? (isCorrect ? AppColors.success : Colors.grey)
-                      : Colors.grey.shade300,
-              width: 1,
-            ),
+            side: BorderSide(color: borderColor ?? Colors.grey, width: 1),
           ),
           leading: CircleAvatar(
-            backgroundColor:
-                isSelected
-                    ? (isCorrect ? AppColors.success : Colors.grey)
-                    : AppColors.primary,
+            backgroundColor: avatarColor,
             child: Text(
               String.fromCharCode(65 + index),
               style: const TextStyle(
@@ -174,20 +188,30 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget _buildExplanation() {
     return Container(
       margin: const EdgeInsets.only(top: 16, bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.warning.withAlpha((0.1 * 255).round()),
-        border: Border.all(color: AppColors.warning),
+        color: AppColors.warning.withOpacity(0.1),
+        border: Border.all(color: AppColors.warning, width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        quizQuestions[_currentQuestionIndex].explanation ??
-            'Resposta incorreta. Consulte as dicas de prevenção para mais informações.',
-        style: const TextStyle(
-          fontSize: 20,
-          color: AppColors.warning,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Explicação:',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.warning,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            quizQuestions[_currentQuestionIndex].explanation ??
+                'Resposta incorreta. Consulte as dicas de prevenção para mais informações.',
+            style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+          ),
+        ],
       ),
     );
   }
@@ -210,6 +234,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final percentage = (_score / quizQuestions.length) * 100;
     if (percentage > QuizScore.bestScore) {
       QuizScore.bestScore = percentage;
+      _saveBestScore(percentage);
     }
 
     String message;
@@ -272,6 +297,20 @@ class _QuizScreenState extends State<QuizScreen> {
               onPressed: _restartQuiz,
               icon: const Icon(Icons.replay),
               label: const Text('Tentar Novamente'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/home');
+              },
+              icon: const Icon(Icons.home),
+              label: const Text('Voltar para o Início'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,

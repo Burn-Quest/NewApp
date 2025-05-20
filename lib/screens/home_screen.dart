@@ -1,4 +1,4 @@
-import 'package:burnquest/models/util/quizScore.dart';
+import 'package:burnquest/models/util/quiz_score.dart';
 import 'package:burnquest/screens/prevention.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,10 +12,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-
 class _HomeScreenState extends State<HomeScreen> {
-  double bestScore = 0;
-
   double _dragExtent = 0.25; // sincronizado com o initialChildSize
   final double _maxHeight = 0.75;
   final double _minHeight = 0.25;
@@ -28,42 +25,26 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkQuizAccess();
-    _updateBestScore();
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
     );
 
-
     // Sincroniza _dragExtent com a posição inicial da sheet
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final initialExtent = _sheetController.size ?? _minHeight;
+      final initialExtent = _sheetController.size;
       setState(() {
         _dragExtent = initialExtent;
       });
 
       _sheetController.addListener(() {
         final currentExtent = _sheetController.size;
-        if (currentExtent != null && currentExtent != _dragExtent) {
+        if (currentExtent != _dragExtent) {
           setState(() {
             _dragExtent = currentExtent;
           });
         }
       });
-    });
-  }
-
-  void _updateBestScore() {
-    setState(() {
-      bestScore = QuizScore.bestScore;
-    });
-  }
-
-  Future<void> _resetQuizAccess() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasSeenAllScreens', false);
-    setState(() {
-      _canAccessQuiz = false;
     });
   }
 
@@ -186,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 24),
                       child: Text(
-                        'Melhor resultado: ${bestScore.toStringAsFixed(0)}%',
+                        'Melhor resultado: ${QuizScore.bestScore.toStringAsFixed(0)}%',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -223,9 +204,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          final newExtent = _dragExtent == _minHeight
-                              ? _maxHeight
-                              : _minHeight;
+                          final newExtent =
+                              _dragExtent == _minHeight
+                                  ? _maxHeight
+                                  : _minHeight;
                           _sheetController.animateTo(
                             newExtent,
                             duration: const Duration(milliseconds: 300),
@@ -271,14 +253,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.quiz_outlined,
                                   AppColors.secondary,
                                   '/quiz',
-                                  onTap: _canAccessQuiz
-                                       ? () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/quiz',
-                                            ).then((_) => _updateBestScore());
-                                          }
-                                      : null,
                                   isEnabled: _canAccessQuiz,
                                 ),
                               ],
@@ -353,7 +327,8 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: InkWell(
-            onTap: onTap ??
+            onTap:
+                onTap ??
                 () {
                   if (route != null) {
                     Navigator.pushNamed(context, route);
@@ -384,23 +359,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showExitDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sair do aplicativo?'),
-        content: const Text('Você tem certeza que deseja sair?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Sair do aplicativo?'),
+            content: const Text('Você tem certeza que deseja sair?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              await _resetQuizAccess();
-              Navigator.pop(context, true);
-            },
-            child: const Text('Sair'),
-          ),
-        ],
-      ),
     ).then((value) {
       if (value == true) {
         SystemNavigator.pop();

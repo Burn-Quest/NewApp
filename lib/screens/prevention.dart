@@ -12,6 +12,22 @@ class Prevention extends StatefulWidget {
 class _PreventionState extends State<Prevention> {
   int _currentIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadImages();
+    });
+  }
+
+  void _preloadImages() {
+    for (var tip in preventionTips) {
+      if (tip.image.isNotEmpty) {
+        precacheImage(AssetImage(tip.image), context);
+      }
+    }
+  }
+
   void _nextTip() {
     if (_currentIndex < preventionTips.length - 1) {
       setState(() {
@@ -61,11 +77,7 @@ class _PreventionState extends State<Prevention> {
               ),
               const SizedBox(height: 20),
               if (currentTip.image.isNotEmpty)
-                Image.asset(
-                  currentTip.image,
-                  width: 200,
-                  fit: BoxFit.contain,
-                ),
+                Image.asset(currentTip.image, width: 200, fit: BoxFit.contain),
               const SizedBox(height: 20),
               if (currentTip.whatToDo != null) ...[
                 Text(
