@@ -81,19 +81,29 @@ class _QuizScreenState extends State<QuizScreen> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildProgressIndicator(),
-          const SizedBox(height: 8),
-          _buildQuestionNumber(),
-          const SizedBox(height: 24),
-          _buildQuestionText(question),
-          const SizedBox(height: 32),
-          ..._buildAnswerCards(question),
-          if (_showExplanation) _buildExplanation(),
-          if (_showNextButton) _buildNextButton(),
-        ],
-      ),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildProgressIndicator(),
+            const SizedBox(height: 8),
+            _buildQuestionNumber(),
+            const SizedBox(height: 24),
+            _buildQuestionText(question),
+            const SizedBox(height: 32),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ..._buildAnswerCards(question),
+                    if (_showExplanation) _buildExplanation(),
+                    if (_showNextButton) _buildNextButton(),
+                    const SizedBox(height: 16), // Bottom padding
+                  ],
+                ),
+              ),
+            ),
+          ],
+        )
     );
   }
 
