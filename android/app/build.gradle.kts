@@ -1,3 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+// O bloco de carregamento do key.properties em Kotlin DSL
+val keystoreProperties = Properties()
+val keystoreFile = rootProject.file("../key.properties")
+if (keystoreFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystoreFile))
+}
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -30,11 +40,43 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+         create("release") {
+            // Adicione estas linhas para depuração temporária
+            println("Debug: key.properties path exists? ${keystoreFile.exists()}")
+            if (keystoreFile.exists()) {
+                println("Debug: Properties loaded. Keys available: ${keystoreProperties.stringPropertyNames()}")
+            }
+            println("Debug: storeFile = ${keystoreProperties["storeFile"]}")
+            println("Debug: keyAlias = ${keystoreProperties["keyAlias"]}")
+            // Fim das linhas de depuração
+
+            if (keystoreProperties.containsKey("keyAlias")) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+            } else {
+                println("Error: keyAlias not found in key.properties!")
+            }
+            if (keystoreProperties.containsKey("keyPassword")) {
+                keyPassword = keystoreProperties["keyPassword"] as String
+            } else {
+                println("Error: keyPassword not found in key.properties!")
+            }
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+            } else {
+                println("Error: storeFile not found in key.properties!")
+            }
+            if (keystoreProperties.containsKey("storePassword")) {
+                storePassword = keystoreProperties["storePassword"] as String
+            } else {
+                println("Error: storePassword not found in key.properties!")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release") // Use getByName para referenciar a configuração de release
         }
     }
 }
